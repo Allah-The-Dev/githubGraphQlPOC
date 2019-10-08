@@ -63,7 +63,7 @@ class DemoBusinessApi {
     private String getQueryForBranches(GitHubDetails gitHubDetails) {
         return String.join(
             System.getProperty("line.separator"), 
-            "listRepos($url:URI!){",
+            "branches($url:URI!){",
                 "resource(url:$url){",
                   "... on Repository{",
                     "refs(refPrefix:\"refs/heads/\",first:100,orderBy:{field:TAG_COMMIT_DATE,direction:DESC}){",
@@ -114,7 +114,7 @@ class DemoBusinessApi {
     private String getQueryForTags(GitHubDetails gitHubDetails) {
         return String.join(
             System.getProperty("line.separator"), 
-            "listRepos($url:URI!){",
+            "tags($url:URI!){",
                 "resource(url:$url){",
                   "... on Repository{",
                     "refs(refPrefix:\"refs/tags/\",first:100,orderBy:{field:TAG_COMMIT_DATE,direction:DESC}){",
