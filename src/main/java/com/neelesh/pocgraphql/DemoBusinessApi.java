@@ -5,9 +5,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -16,6 +19,9 @@ import org.springframework.web.client.RestTemplate;
 
 @Service
 class DemoBusinessApi {
+
+    private static Logger logger = LoggerFactory.getLogger(DemoBusinessApi.class);
+
     private final RestTemplate restTemplate;
 
     public DemoBusinessApi(RestTemplateBuilder restTemplateBuilder) {
@@ -54,7 +60,11 @@ class DemoBusinessApi {
                              entity, String.class);
 
         // checking status
-
+        if(HttpStatus.OK.equals(responseForGetBranch.getStatusCode())){
+            logger.info("voila for branches");
+        }else{
+            logger.info("try again for branches");
+        }
 
         // extracting result
         return null;
@@ -101,11 +111,15 @@ class DemoBusinessApi {
         HttpEntity<MultiValueMap<String,String>> entity = new HttpEntity<>(map,headers); 
      
         // restcall
-        ResponseEntity<String> responseForGetBranch = restTemplate.postForEntity("https://api.github.com/graphql",
+        ResponseEntity<String> responseForGetTags = restTemplate.postForEntity("https://api.github.com/graphql",
                              entity, String.class);
 
         // checking status
-
+        if(HttpStatus.OK.equals(responseForGetTags.getStatusCode())){
+            logger.info("voila for tags");
+        }else{
+            logger.info("try again for tags");
+        }
 
         // extracting result
         return null;
