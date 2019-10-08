@@ -50,7 +50,7 @@ class DemoBusinessApi {
         // body  
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
         map.add("query", getQueryForBranches());
-        map.add("variables", "{\"url\":"+gitHubDetails.getRepoUrl().replace(".git", "")+"}");
+        map.add("variables", "{\"url\":\""+gitHubDetails.getRepoUrl().replace(".git", "")+"\"}");
 
         // httpentity to hold header and body
         HttpEntity<MultiValueMap<String,String>> entity = new HttpEntity<>(map,headers); 
