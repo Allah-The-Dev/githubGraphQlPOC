@@ -33,12 +33,12 @@ class DemoBusinessApi {
         // map of list to store 2 list 
         // one for branches and one for tags
         Map<String, List<String>> mapOfBranchAndTag = new HashMap<>();
-        mapOfBranchAndTag.put("branches", getBranches(gitHubDetails));
-        mapOfBranchAndTag.put("tags",getTags(gitHubDetails));
+        mapOfBranchAndTag.put("branches", getRefs(gitHubDetails,"heads"));
+        mapOfBranchAndTag.put("tags",getRefs(gitHubDetails,"tags"));
         return mapOfBranchAndTag;
     }
 
-    private List<String> getBranches(GitHubDetails gitHubDetails) {
+    private List<String> getRefs(GitHubDetails gitHubDetails,String refName) {
 
         // return object of list of branches
         List<String> listOfBranches = new ArrayList<>();
@@ -49,7 +49,7 @@ class DemoBusinessApi {
 
         // body  
         MultiValueMap<String, String> requestBodyMap = new LinkedMultiValueMap<>();
-        requestBodyMap.add("query", getQueryForBranches());
+        requestBodyMap.add("query", getQueryForRefs(refName));
         requestBodyMap.add("variables", "{\"url\":\""+gitHubDetails.getRepoUrl()+"\"}");
 
         // httpentity to hold header and body
@@ -70,84 +70,29 @@ class DemoBusinessApi {
         return listOfBranches;
     }
 
-    private String getQueryForBranches() {
-        return String.join(
-            System.getProperty("line.separator"), 
-            "branches($url:URI!){",
-                "resource(url:$url){",
-                  "... on Repository{",
-                    "refs(refPrefix:\"refs/heads/\",first:100,orderBy:{field:TAG_COMMIT_DATE,direction:DESC}){",
-                      "totalCount",
-                      "pageInfo{",
-                        "hasNextPage",
-                        "endCursor",
-                      "}",
-                      "edges{",
-                        "node{",
-                          "name",
-                        "}",
-                      "}",
+    private String getQueryForRefs(String refName) {
+      String refPrefix = "\"refs/"+refName+"/\"";
+      return String.join(
+        System.getProperty("line.separator"), 
+        "query branches($url:URI!){",
+            "resource(url:$url){",
+              "... on Repository{",
+                "refs(refPrefix:"+refPrefix+",first:100,orderBy:{field:TAG_COMMIT_DATE,direction:DESC}){",
+                  "totalCount",
+                  "pageInfo{",
+                    "hasNextPage",
+                    "endCursor",
+                  "}",
+                  "edges{",
+                    "node{",
+                      "name",
                     "}",
                   "}",
                 "}",
-               "}" 
-            );
-    }
-
-    private List<String> getTags(GitHubDetails gitHubDetails) {
-
-        // return object of list of branches
-        List<String> listOfTags = new ArrayList<>();
-
-        // header
-        HttpHeaders requestHeader = new HttpHeaders();
-        requestHeader.set("Authorization", "bearer "+gitHubDetails.getAccessToken());
-
-        // body  
-        MultiValueMap<String, String> requestBodyMap = new LinkedMultiValueMap<>();
-        requestBodyMap.add("query", getQueryForTags());
-        requestBodyMap.add("variables", "{\"url\":\""+gitHubDetails.getRepoUrl()+"\"}");
-
-        // httpentity to hold header and body
-        HttpEntity<MultiValueMap<String,String>> requestEntity = new HttpEntity<>(requestBodyMap,requestHeader); 
-     
-        // restcall
-        ResponseEntity<String> responseForGetTags = restTemplate.postForEntity("https://api.github.com/graphql",
-                                                                  requestEntity, String.class);
-
-        // checking status
-        if(HttpStatus.OK.equals(responseForGetTags.getStatusCode())){
-            logger.info("voila for tags");
-        }else{
-            logger.info("try again for tags");
-        }
-
-        // extracting result
-        return listOfTags;
-    }
-
-    private String getQueryForTags() {
-        return String.join(
-            System.getProperty("line.separator"), 
-            "tags($url:URI!){",
-                "resource(url:$url){",
-                  "... on Repository{",
-                    "refs(refPrefix:\"refs/tags/\",first:100,orderBy:{field:TAG_COMMIT_DATE,direction:DESC}){",
-                      "totalCount",
-                      "pageInfo{",
-                        "hasNextPage",
-                        "endCursor",
-                      "}",
-                      "edges{",
-                        "node{",
-                          "name",
-                        "}",
-                      "}",
-                    "}",
-                  "}",
-                "}",
-              "}"
-            );
+              "}",
+            "}",
+          "}" 
+        );
     }
 
 }
