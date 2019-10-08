@@ -47,7 +47,7 @@ class DemoBusinessApi {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "bearer "+gitHubDetails.getAccessToken());
 
-        // body
+        // body  
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
         map.add("query", getQueryForBranches(gitHubDetails));
         map.add("variable", "{\"url\":"+gitHubDetails.getRepoUrl().replace(".git", "")+"}");
@@ -67,7 +67,7 @@ class DemoBusinessApi {
         }
 
         // extracting result
-        return null;
+        return listOfBranches;
     }
 
     private String getQueryForBranches(GitHubDetails gitHubDetails) {
@@ -122,7 +122,7 @@ class DemoBusinessApi {
         }
 
         // extracting result
-        return null;
+        return listOfTags;
     }
 
     private String getQueryForTags(GitHubDetails gitHubDetails) {
