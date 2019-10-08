@@ -3,8 +3,9 @@ package com.neelesh.pocgraphql;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,7 +22,7 @@ public class DemoRestApi{
     @Autowired
     private DemoBusinessApi demoBusinessApi;
 
-    @GetMapping(path="/getBranchesAndTags",produces = "application/json")
+    @PostMapping(path="/getBranchesAndTags",produces = "application/json")
     public ResponseEntity<Map<String,List<String>>> getBranchesAndTags(@RequestBody GitHubDetails githubDetails){
         Map<String,List<String>> mapOfBranchAndTagList = null;
         try {
@@ -30,9 +31,13 @@ public class DemoRestApi{
            logger.info(e.toString());
         }
         if(mapOfBranchAndTagList != null && !mapOfBranchAndTagList.isEmpty()){
-            return (ResponseEntity<Map<String,List<String>>>) ResponseEntity.ok().body(mapOfBranchAndTagList);
+            return (ResponseEntity<Map<String,List<String>>>) ResponseEntity
+                                                                .ok()
+                                                                .body(mapOfBranchAndTagList);
         }else{
-            return (ResponseEntity<Map<String,List<String>>>) ResponseEntity.noContent();
+            return  (ResponseEntity<Map<String, List<String>>>) ResponseEntity
+                                                                    .status(HttpStatus.NO_CONTENT)
+                                                                    .body(mapOfBranchAndTagList);
         }
     }
 
