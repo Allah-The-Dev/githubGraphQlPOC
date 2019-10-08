@@ -44,20 +44,20 @@ class DemoBusinessApi {
         List<String> listOfBranches = new ArrayList<>();
 
         // header
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "bearer "+gitHubDetails.getAccessToken());
+        HttpHeaders requestHeader = new HttpHeaders();
+        requestHeader.set("Authorization", "bearer "+gitHubDetails.getAccessToken());
 
         // body  
-        MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
-        map.add("query", getQueryForBranches());
-        map.add("variables", "{\"url\":\""+gitHubDetails.getRepoUrl().replace(".git", "")+"\"}");
+        MultiValueMap<String, String> requestBodyMap = new LinkedMultiValueMap<>();
+        requestBodyMap.add("query", getQueryForBranches());
+        requestBodyMap.add("variables", "{\"url\":\""+gitHubDetails.getRepoUrl()+"\"}");
 
         // httpentity to hold header and body
-        HttpEntity<MultiValueMap<String,String>> entity = new HttpEntity<>(map,headers); 
+        HttpEntity<MultiValueMap<String,String>> requestEntity = new HttpEntity<>(requestBodyMap,requestHeader); 
      
         // restcall
         ResponseEntity<String> responseForGetBranch = restTemplate.postForEntity("https://api.github.com/graphql",
-                             entity, String.class);
+                                                                    requestEntity, String.class);
 
         // checking status
         if(HttpStatus.OK.equals(responseForGetBranch.getStatusCode())){
@@ -99,20 +99,20 @@ class DemoBusinessApi {
         List<String> listOfTags = new ArrayList<>();
 
         // header
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "bearer "+gitHubDetails.getAccessToken());
+        HttpHeaders requestHeader = new HttpHeaders();
+        requestHeader.set("Authorization", "bearer "+gitHubDetails.getAccessToken());
 
-        // body
-        MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
-        map.add("query", getQueryForTags());
-        map.add("variables", "{\"url\":"+gitHubDetails.getRepoUrl().replace(".git", "")+"}");
+        // body  
+        MultiValueMap<String, String> requestBodyMap = new LinkedMultiValueMap<>();
+        requestBodyMap.add("query", getQueryForTags());
+        requestBodyMap.add("variables", "{\"url\":\""+gitHubDetails.getRepoUrl()+"\"}");
 
         // httpentity to hold header and body
-        HttpEntity<MultiValueMap<String,String>> entity = new HttpEntity<>(map,headers); 
+        HttpEntity<MultiValueMap<String,String>> requestEntity = new HttpEntity<>(requestBodyMap,requestHeader); 
      
         // restcall
         ResponseEntity<String> responseForGetTags = restTemplate.postForEntity("https://api.github.com/graphql",
-                             entity, String.class);
+                                                                  requestEntity, String.class);
 
         // checking status
         if(HttpStatus.OK.equals(responseForGetTags.getStatusCode())){
