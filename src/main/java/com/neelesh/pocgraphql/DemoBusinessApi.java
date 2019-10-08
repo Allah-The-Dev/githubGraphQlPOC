@@ -46,11 +46,12 @@ class DemoBusinessApi {
         // header
         HttpHeaders requestHeader = new HttpHeaders();
         requestHeader.set("Authorization", "bearer "+gitHubDetails.getAccessToken());
+        requestHeader.set("Accept","application/json");
 
         // body  
         MultiValueMap<String, String> requestBodyMap = new LinkedMultiValueMap<>();
         requestBodyMap.add("query", getQueryForRefs(refName));
-        requestBodyMap.add("variables", "{\"url\":\""+gitHubDetails.getRepoUrl()+"\"}");
+        requestBodyMap.add("variables", "{url:\""+gitHubDetails.getRepoUrl()+"\"}");
 
         // httpentity to hold header and body
         HttpEntity<MultiValueMap<String,String>> requestEntity = new HttpEntity<>(requestBodyMap,requestHeader); 
@@ -74,7 +75,7 @@ class DemoBusinessApi {
       String refPrefix = "\"refs/"+refName+"/\"";
       return String.join(
         System.getProperty("line.separator"), 
-        "query branches($url:URI!){",
+        "query ($url:URI!){",
             "resource(url:$url){",
               "... on Repository{",
                 "refs(refPrefix:"+refPrefix+",first:100,orderBy:{field:TAG_COMMIT_DATE,direction:DESC}){",
@@ -92,7 +93,7 @@ class DemoBusinessApi {
               "}",
             "}",
           "}" 
-        );
+      );
     }
 
 }
