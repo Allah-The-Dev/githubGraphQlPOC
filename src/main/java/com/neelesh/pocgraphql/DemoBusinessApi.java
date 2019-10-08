@@ -23,9 +23,12 @@ class DemoBusinessApi {
     }
 
     public Map<String, List<String>> getGitHubBranchesAndTags(GitHubDetails gitHubDetails) {
-        Map<String, List<String>> mapOfBranchAndTag = new HashMap<>();
-        mapOfBranchAndTag.put("branch", getBranches(gitHubDetails));
 
+        // map of list to store 2 list 
+        // one for branches and one for tags
+        Map<String, List<String>> mapOfBranchAndTag = new HashMap<>();
+        mapOfBranchAndTag.put("branches", getBranches(gitHubDetails));
+        mapOfBranchAndTag.put("tags",getTags(gitHubDetails));
         return mapOfBranchAndTag;
     }
 
@@ -40,7 +43,7 @@ class DemoBusinessApi {
 
         // body
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
-        map.add("query", getQueryForBranch(gitHubDetails));
+        map.add("query", getQueryForBranches(gitHubDetails));
         map.add("variable", "{\"url\":"+gitHubDetails.getRepoUrl().replace(".git", "")+"}");
 
         // httpentity to hold header and body
@@ -51,19 +54,70 @@ class DemoBusinessApi {
                              entity, String.class);
 
         // checking status
-        
+
 
         // extracting result
         return null;
     }
 
-    private String getQueryForBranch(GitHubDetails gitHubDetails) {
+    private String getQueryForBranches(GitHubDetails gitHubDetails) {
         return String.join(
             System.getProperty("line.separator"), 
             "listRepos($url:URI!){",
                 "resource(url:$url){",
                   "... on Repository{",
                     "refs(refPrefix:\"refs/heads/\",first:100,orderBy:{field:TAG_COMMIT_DATE,direction:DESC}){",
+                      "totalCount",
+                      "pageInfo{",
+                        "hasNextPage",
+                        "endCursor",
+                      "}",
+                      "edges{",
+                        "node{",
+                          "name",
+                        "}",
+                      "}",
+                    "}",
+                  "}",
+                "}"
+            );
+    }
+
+    private List<String> getTags(GitHubDetails gitHubDetails) {
+
+        // return object of list of branches
+        List<String> listOfTags = new ArrayList<>();
+
+        // header
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "bearer "+gitHubDetails.getAccessToken());
+
+        // body
+        MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
+        map.add("query", getQueryForTags(gitHubDetails));
+        map.add("variable", "{\"url\":"+gitHubDetails.getRepoUrl().replace(".git", "")+"}");
+
+        // httpentity to hold header and body
+        HttpEntity<MultiValueMap<String,String>> entity = new HttpEntity<>(map,headers); 
+     
+        // restcall
+        ResponseEntity<String> responseForGetBranch = restTemplate.postForEntity("https://api.github.com/graphql",
+                             entity, String.class);
+
+        // checking status
+
+
+        // extracting result
+        return null;
+    }
+
+    private String getQueryForTags(GitHubDetails gitHubDetails) {
+        return String.join(
+            System.getProperty("line.separator"), 
+            "listRepos($url:URI!){",
+                "resource(url:$url){",
+                  "... on Repository{",
+                    "refs(refPrefix:\"refs/tags/\",first:100,orderBy:{field:TAG_COMMIT_DATE,direction:DESC}){",
                       "totalCount",
                       "pageInfo{",
                         "hasNextPage",

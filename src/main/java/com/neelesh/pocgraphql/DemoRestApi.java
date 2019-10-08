@@ -19,8 +19,12 @@ public class DemoRestApi{
 
     @GetMapping(path="/getBranchesAndTags",produces = "application/json")
     public ResponseEntity<Map<String,List<String>>> getBranchesAndTags(@RequestBody GitHubDetails githubDetails){
-        Map<String,List<String>> branchAndTagList = demoBusinessApi.getGitHubBranches(githubDetails);
-        return "Hello ";
+        Map<String,List<String>> mapOFBranchAndTagList = demoBusinessApi.getGitHubBranchesAndTags(githubDetails);
+        if(!mapOFBranchAndTagList.isEmpty()){
+            return (ResponseEntity<Map<String,List<String>>>) ResponseEntity.ok().body(mapOFBranchAndTagList);
+        }else{
+            return (ResponseEntity<Map<String,List<String>>>) ResponseEntity.noContent();
+        }
     }
 
 }
