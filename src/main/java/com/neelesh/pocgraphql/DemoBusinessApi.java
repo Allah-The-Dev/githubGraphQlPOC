@@ -41,7 +41,7 @@ class DemoBusinessApi {
     private List<String> getRefs(GitHubDetails gitHubDetails,String refName) {
 
         // return object of list of branches
-        List<String> listOfBranches = new ArrayList<>();
+        List<String> listOfRefs = new ArrayList<>();
 
         // header
         HttpHeaders requestHeader = new HttpHeaders();
@@ -56,18 +56,18 @@ class DemoBusinessApi {
         HttpEntity<MultiValueMap<String,String>> requestEntity = new HttpEntity<>(requestBodyMap,requestHeader); 
      
         // restcall
-        ResponseEntity<String> responseForGetBranch = restTemplate.postForEntity("https://api.github.com/graphql",
+        ResponseEntity<String> responseForGetRefs = restTemplate.postForEntity("https://api.github.com/graphql",
                                                                     requestEntity, String.class);
 
         // checking status
-        if(HttpStatus.OK.equals(responseForGetBranch.getStatusCode())){
-            logger.info("voila for branches");
+        if(HttpStatus.OK.equals(responseForGetRefs.getStatusCode())){
+            logger.info("voila for refs");
         }else{
-            logger.info("try again for branches");
+            logger.info("try again for refs");
         }
 
         // extracting result
-        return listOfBranches;
+        return listOfRefs;
     }
 
     private String getQueryForRefs(String refName) {
