@@ -49,7 +49,7 @@ class DemoBusinessApi {
 
         // body  
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
-        map.add("query", getQueryForBranches(gitHubDetails));
+        map.add("query", getQueryForBranches());
         map.add("variable", "{\"url\":"+gitHubDetails.getRepoUrl().replace(".git", "")+"}");
 
         // httpentity to hold header and body
@@ -70,7 +70,7 @@ class DemoBusinessApi {
         return listOfBranches;
     }
 
-    private String getQueryForBranches(GitHubDetails gitHubDetails) {
+    private String getQueryForBranches() {
         return String.join(
             System.getProperty("line.separator"), 
             "branches($url:URI!){",
@@ -104,7 +104,7 @@ class DemoBusinessApi {
 
         // body
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
-        map.add("query", getQueryForTags(gitHubDetails));
+        map.add("query", getQueryForTags());
         map.add("variable", "{\"url\":"+gitHubDetails.getRepoUrl().replace(".git", "")+"}");
 
         // httpentity to hold header and body
@@ -125,7 +125,7 @@ class DemoBusinessApi {
         return listOfTags;
     }
 
-    private String getQueryForTags(GitHubDetails gitHubDetails) {
+    private String getQueryForTags() {
         return String.join(
             System.getProperty("line.separator"), 
             "tags($url:URI!){",
