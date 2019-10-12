@@ -5,11 +5,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -46,19 +48,20 @@ class DemoBusinessApi {
         // header
         HttpHeaders requestHeader = new HttpHeaders();
         requestHeader.set("Authorization", "bearer "+gitHubDetails.getAccessToken());
-        requestHeader.set("Accept","application/json");
 
         // body  
-        MultiValueMap<String, String> requestBodyMap = new LinkedMultiValueMap<>();
-        requestBodyMap.add("query", getQueryForRefs(refName));
-        requestBodyMap.add("variables", "{url:\""+gitHubDetails.getRepoUrl()+"\"}");
+        // MultivalueMap didn't work here,
+        JSONObject requestBodyJSON = new JSONObject();
+        requestBodyJSON.put("query", getQueryForRefs(refName,gitHubDetails));
+
+        // requestBodyMap.add("variables", "{url:\""+gitHubDetails.getRepoUrl()+"\"}");
 
         // httpentity to hold header and body
-        HttpEntity<MultiValueMap<String,String>> requestEntity = new HttpEntity<>(requestBodyMap,requestHeader); 
+        HttpEntity<String> requestEntity = new HttpEntity<>(requestBodyJSON.toString(),requestHeader); 
      
         // restcall
-        ResponseEntity<String> responseForGetRefs = restTemplate.postForEntity("https://api.github.com/graphql",
-                                                                    requestEntity, String.class);
+        ResponseEntity<String> responseForGetRefs = restTemplate.exchange("https://api.github.com/graphql",
+                                                                    HttpMethod.POST,requestEntity, String.class);
 
         // checking status
         if(HttpStatus.OK.equals(responseForGetRefs.getStatusCode())){
@@ -71,12 +74,20 @@ class DemoBusinessApi {
         return listOfRefs;
     }
 
-    private String getQueryForRefs(String refName) {
+    private String getQueryForRefs(String refName, GitHubDetails gitHubDetails) {
       String refPrefix = "\"refs/"+refName+"/\"";
+      // return String.join(
+      //   System.getProperty("line.separator"),
+      //   "{",
+      //     "repository(owner:\"Allah-The-Dev\",name:\"forms-reactive-start\"){",
+      //       "createdAt",
+      //     "}",
+      //   "}"
+      // );
       return String.join(
         System.getProperty("line.separator"), 
-        "query ($url:URI!){",
-            "resource(url:$url){",
+        "{",
+            "resource(url:\""+gitHubDetails.getRepoUrl()+"\"){",
               "... on Repository{",
                 "refs(refPrefix:"+refPrefix+",first:100,orderBy:{field:TAG_COMMIT_DATE,direction:DESC}){",
                   "totalCount",
