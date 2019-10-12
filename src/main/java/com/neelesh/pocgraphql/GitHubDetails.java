@@ -19,6 +19,5 @@ class GitHubDetails{
     public void setAccessToken(String accessToken) {
         this.accessToken = accessToken;
     }
-
         
 }
