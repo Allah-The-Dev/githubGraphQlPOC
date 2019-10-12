@@ -50,7 +50,7 @@ class DemoBusinessApi {
       // body  
       // MultivalueMap didn't work here,
       JSONObject requestBodyJSON = new JSONObject();
-      requestBodyJSON.put("query", getQueryForRefs(refName,gitHubDetails));
+      requestBodyJSON.put("query", getQueryForRefs(refName));
       requestBodyJSON.put("variables", "{url:\""+gitHubDetails.getRepoUrl()+"\"}");
       // requestBodyMap.add("variables", "{url:\""+gitHubDetails.getRepoUrl()+"\"}");
 
@@ -59,7 +59,9 @@ class DemoBusinessApi {
     
       // restcall
       ResponseEntity<String> responseForGetRefs = restTemplate.exchange("https://api.github.com/graphql",
-                                                                  HttpMethod.POST,requestEntity, String.class);
+                                                                  HttpMethod.POST,
+                                                                  requestEntity, 
+                                                                  String.class);
 
       // checking status
       if(HttpStatus.OK.equals(responseForGetRefs.getStatusCode())){
@@ -72,7 +74,7 @@ class DemoBusinessApi {
       return listOfRefs;
   }
 
-  private String getQueryForRefs(String refName, GitHubDetails gitHubDetails) {
+  private String getQueryForRefs(String refName) {
     String refPrefix = "\"refs/"+refName+"/\"";
     return String.join(
       System.getProperty("line.separator"), 
@@ -98,7 +100,71 @@ class DemoBusinessApi {
   }
 
 public Map<String, Map<String,String>> getGitHubDevDetails(List<GitHubDetails> githubDetailsList) {
-	return null;
+  Map<String,Map<String,String>> devDetailsMap = new HashMap<>();
+  githubDetailsList.forEach(singleGithubDetail -> {
+    getDetailsForSingleRepo(singleGithubDetail);
+  });
+  return devDetailsMap;
 }
+
+private void getDetailsForSingleRepo(GitHubDetails singleGithubDetail) {
+  //request header
+  HttpHeaders requestHeader = new HttpHeaders();
+  requestHeader.set("Authorization", "bearer "+singleGithubDetail.getAccessToken());
+  //request body
+  JSONObject requestBodyJSON = new JSONObject();
+  requestBodyJSON.put("query",getQueryForCommitDetails());
+  requestBodyJSON.put("variables","{url:\""+singleGithubDetail.getRepoUrl()+"\"}");
+  //request entity
+  HttpEntity<String> requestEntity = new HttpEntity<>(requestBodyJSON.toString(),requestHeader);
+  //http post call
+  ResponseEntity<JSONObject> responseEntity = restTemplate.exchange("https://api.github.com/graphql",
+                                                        HttpMethod.POST,
+                                                        requestEntity,
+                                                        JSONObject.class);
+  //checking status
+  if(HttpStatus.OK.equals(responseEntity.getStatusCode())){
+    logger.info("voila");
+  }
+}
+
+  private String getQueryForCommitDetails() {
+    return String.join(
+      System.getProperty("line.separator"),
+      "query($url:URI!) {",
+        "resource(url:$url) {",
+          "... on Repository {",
+           "refs(refPrefix:\"refs/heads/\",first:100,orderBy:{field:TAG_COMMIT_DATE,direction:DESC}){",
+             "pageInfo{",
+               "hasNextPage",
+               "endCursor",
+             "}",
+             "... commitQueryOnRefConn",
+           "}",
+          "}",
+        "}",
+       "}",
+       "fragment commitQueryOnRefConn on RefConnection{",
+        "edges{",
+         "node{",
+           "target{",
+             "... on Commit{",
+               "author{",
+                 "name",
+                 "email",
+               "}",
+               "committedDate",
+               "additions",
+               "deletions",
+               "parents(first:5){",
+                 "totalCount",
+               "}",
+             "}",
+           "}",
+         "}",
+        "}",
+       "}"
+    );
+  }
 
 }
