@@ -41,4 +41,23 @@ public class DemoRestApi{
         }
     }
 
+    @PostMapping(path="/getDevDetails",produces = "application/json")
+    public ResponseEntity<Map<String,Map<String,String>>> getDevDetails(@RequestBody List<GitHubDetails> githubDetailsList){
+        Map<String,Map<String,String>> githubDevDetailsList = null;
+        try {
+            githubDevDetailsList = demoBusinessApi.getGitHubDevDetails(githubDetailsList);
+        } catch (Exception e) {
+           logger.info(e.toString());
+        }
+        if(githubDevDetailsList != null && !githubDevDetailsList.isEmpty()){
+            return (ResponseEntity<Map<String,Map<String,String>>>) ResponseEntity
+                                                                .ok()
+                                                                .body(githubDevDetailsList);
+        }else{
+            return  (ResponseEntity<Map<String,Map<String,String>>>) ResponseEntity
+                                                                    .status(HttpStatus.NO_CONTENT)
+                                                                    .body(githubDevDetailsList);
+        }
+    }
+
 }
