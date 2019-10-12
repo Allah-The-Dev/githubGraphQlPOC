@@ -97,4 +97,8 @@ class DemoBusinessApi {
     );
   }
 
+public Map<String, Map<String,String>> getGitHubDevDetails(List<GitHubDetails> githubDetailsList) {
+	return null;
+}
+
 }
