@@ -1,0 +1,41 @@
+query ($url: URI!, $since: GitTimestamp!, $until: GitTimestamp!) {
+  resource(url: $url) {
+    ... on Repository {
+      refs(refPrefix: "refs/heads/", first: 100, orderBy: {field: TAG_COMMIT_DATE, direction: DESC}) {
+        pageInfo {
+          hasNextPage
+          endCursor
+        }
+        nodes {
+          target {
+            ... on Commit {
+              history(since: $since, until: $until) {
+                ...commitFragmentONCommitHistoryConn
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+fragment commitFragmentONCommitHistoryConn on CommitHistoryConnection {
+  pageInfo {
+    hasNextPage
+    endCursor
+  }
+  edges {
+    node {
+      committedDate
+      author {
+        name
+        email
+      }
+      additions
+      deletions
+      parents(first: 5) {
+        totalCount
+      }
+    }
+  }
+}
