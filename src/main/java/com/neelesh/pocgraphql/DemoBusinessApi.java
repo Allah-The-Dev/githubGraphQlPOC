@@ -124,8 +124,10 @@ class DemoBusinessApi {
     // request entity
     HttpEntity<String> requestEntity = new HttpEntity<>(requestBodyJSON.toString(), requestHeader);
     // http post call
-    ResponseEntity<JSONObject> responseEntity = restTemplate.exchange("https://api.github.com/graphql", HttpMethod.POST,
-        requestEntity, JSONObject.class);
+    ResponseEntity<JSONObject> responseEntity = restTemplate.exchange("https://api.github.com/graphql", 
+                                                                      HttpMethod.POST,
+                                                                      requestEntity, 
+                                                                      JSONObject.class);
     // checking status
     if (HttpStatus.OK.equals(responseEntity.getStatusCode())) {
       logger.info("voila");
