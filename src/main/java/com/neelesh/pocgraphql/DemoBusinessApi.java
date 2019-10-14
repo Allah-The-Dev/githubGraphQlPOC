@@ -140,9 +140,9 @@ class DemoBusinessApi {
     return String.join(
       System.getProperty("line.separator"),
       "{",
-        "url:"+singleGithubDetail.getRepoUrl()+",",
-        "since:"+since+",",
-        "until:"+until+",",
+        "url:\""+singleGithubDetail.getRepoUrl()+"\",",
+        "since:\""+since+"\",",
+        "until:\""+until+"\",",
       "}"
     );
   }
