@@ -63,8 +63,10 @@ class DemoBusinessApi {
     HttpEntity<String> requestEntity = new HttpEntity<>(requestBodyJSON.toString(), requestHeader);
 
     // restcall
-    ResponseEntity<String> responseForGetRefs = restTemplate.exchange("https://api.github.com/graphql", HttpMethod.POST,
-        requestEntity, String.class);
+    ResponseEntity<String> responseForGetRefs = restTemplate.exchange("https://api.github.com/graphql", 
+                                                                      HttpMethod.POST,
+                                                                      requestEntity, 
+                                                                      String.class);
 
     // checking status
     if (HttpStatus.OK.equals(responseForGetRefs.getStatusCode())) {
