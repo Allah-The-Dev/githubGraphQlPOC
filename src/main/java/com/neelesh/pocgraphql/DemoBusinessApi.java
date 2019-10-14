@@ -106,19 +106,19 @@ class DemoBusinessApi {
   public Map<String, Map<String, String>> getGitHubDevDetails(List<GitHubDetails> githubDetailsList, String since, String until) {
     Map<String, Map<String, String>> devDetailsMap = new HashMap<>();
     githubDetailsList.forEach(singleGithubDetail -> {
-      getDetailsForSingleRepo(singleGithubDetail);
+      getDetailsForSingleRepo(singleGithubDetail,since,until);
     });
     return devDetailsMap;
   }
 
-  private void getDetailsForSingleRepo(GitHubDetails singleGithubDetail) {
+  private void getDetailsForSingleRepo(GitHubDetails singleGithubDetail, String since, String until) {
     // request header
     HttpHeaders requestHeader = new HttpHeaders();
     requestHeader.set("Authorization", "bearer " + singleGithubDetail.getAccessToken());
     // request body
     JSONObject requestBodyJSON = new JSONObject();
     requestBodyJSON.put("query", getQueryForCommitDetails());
-    requestBodyJSON.put("variables", "{url:\"" + singleGithubDetail.getRepoUrl() + "\"}");
+    requestBodyJSON.put("variables",getVariablesForCommitQuery(singleGithubDetail,since,until));
     // request entity
     HttpEntity<String> requestEntity = new HttpEntity<>(requestBodyJSON.toString(), requestHeader);
     // http post call
@@ -128,6 +128,14 @@ class DemoBusinessApi {
     if (HttpStatus.OK.equals(responseEntity.getStatusCode())) {
       logger.info("voila");
     }
+  }
+
+  private String getVariablesForCommitQuery(GitHubDetails singleGithubDetail, String since, String until) {
+    JSONObject variableJSON = new JSONObject();
+    variableJSON.put("url", singleGithubDetail.getRepoUrl());
+    variableJSON.put("since", since);
+    variableJSON.put("until", until);
+    return variableJSON.toString();
   }
 
   private String getQueryForCommitDetails() {
