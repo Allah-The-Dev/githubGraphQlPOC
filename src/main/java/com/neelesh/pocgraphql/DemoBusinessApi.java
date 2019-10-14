@@ -155,7 +155,7 @@ class DemoBusinessApi {
                                               .map(line -> line.trim())
                                               .collect(Collectors.toList());
     } catch (IOException e) {
-      logger.info(e.toString());
+      logger.info("Error while reading query from a file : ",e);
     }
     if(listOfQueryLines !=null && !listOfQueryLines.isEmpty()){
       return String.join(
