@@ -137,11 +137,14 @@ class DemoBusinessApi {
   }
 
   private String getVariablesForCommitQuery(GitHubDetails singleGithubDetail, String since, String until) {
-    JSONObject variableJSON = new JSONObject();
-    variableJSON.put("url", singleGithubDetail.getRepoUrl());
-    variableJSON.put("since", since);
-    variableJSON.put("until", until);
-    return variableJSON.toString();
+    return String.join(
+      System.getProperty("line.separator"),
+      "{",
+        "url:"+singleGithubDetail.getRepoUrl()+",",
+        "since:"+since+",",
+        "until:"+until+",",
+      "}"
+    );
   }
 
   private String getQueryForCommitDetails() {
