@@ -142,7 +142,7 @@ class DemoBusinessApi {
       "{",
         "url:\""+singleGithubDetail.getRepoUrl()+"\",",
         "since:\""+since+"\",",
-        "until:\""+until+"\",",
+        "until:\""+until+"\"",
       "}"
     );
   }
