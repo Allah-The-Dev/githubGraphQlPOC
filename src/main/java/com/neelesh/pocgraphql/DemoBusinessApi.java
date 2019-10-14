@@ -105,8 +105,10 @@ class DemoBusinessApi {
 
   public Map<String, Map<String, String>> getGitHubDevDetails(List<GitHubDetails> githubDetailsList, String since, String until) {
     Map<String, Map<String, String>> devDetailsMap = new HashMap<>();
+    String sinceInISO8601 = since+"T00:00:00+05:30";
+    String untilInISO8601 = until+"T24:00:00+05:30";
     githubDetailsList.forEach(singleGithubDetail -> {
-      getDetailsForSingleRepo(singleGithubDetail,since,until);
+      getDetailsForSingleRepo(singleGithubDetail,sinceInISO8601,untilInISO8601);
     });
     return devDetailsMap;
   }
