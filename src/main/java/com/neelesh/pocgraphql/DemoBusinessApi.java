@@ -150,7 +150,7 @@ class DemoBusinessApi {
   private String getQueryForCommitDetails() {
     List<String> listOfQueryLines = null;
     try {
-      listOfQueryLines = (List<String>) Files.readAllLines(Paths.get("src/main/resources/QueryForCommitHistory.txt"),StandardCharsets.UTF_8)
+      listOfQueryLines = (List<String>) Files.readAllLines(Paths.get("src/main/resources/QueryForCommitHistory.graphql"),StandardCharsets.UTF_8)
                                               .stream()
                                               .map(line -> line.trim())
                                               .collect(Collectors.toList());
