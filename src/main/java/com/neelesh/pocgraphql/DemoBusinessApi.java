@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.google.gson.Gson;
+
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +28,7 @@ import org.springframework.web.client.RestTemplate;
 class DemoBusinessApi {
 
   private static Logger logger = LoggerFactory.getLogger(DemoBusinessApi.class);
+
 
   private final RestTemplate restTemplate;
 
@@ -110,12 +113,15 @@ class DemoBusinessApi {
     String sinceInISO8601 = since+"T00:00:00+05:30";
     String untilInISO8601 = until+"T24:00:00+05:30";
     githubDetailsList.forEach(singleGithubDetail -> {
-      getDetailsForSingleRepo(singleGithubDetail,sinceInISO8601,untilInISO8601);
+      getDetailsForSingleRepo(devDetailsMap,singleGithubDetail,sinceInISO8601,untilInISO8601);
     });
     return devDetailsMap;
   }
 
-  private void getDetailsForSingleRepo(GitHubDetails singleGithubDetail, String since, String until) {
+  private void getDetailsForSingleRepo(Map<String, Map<String, String>> devDetailsMap, 
+    GitHubDetails singleGithubDetail,
+    String since, 
+    String until) {
     // request header
     HttpHeaders requestHeader = new HttpHeaders();
     requestHeader.set("Authorization", "bearer " + singleGithubDetail.getAccessToken());
@@ -123,16 +129,21 @@ class DemoBusinessApi {
     JSONObject requestBodyJSON = new JSONObject();
     requestBodyJSON.put("query", getQueryForCommitDetails());
     requestBodyJSON.put("variables",getVariablesForCommitQuery(singleGithubDetail,since,until));
-    // request entity
+    // request entity                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
     HttpEntity<String> requestEntity = new HttpEntity<>(requestBodyJSON.toString(), requestHeader);
     // http post call
-    ResponseEntity<String> responseEntity = restTemplate.exchange("https://api.github.com/graphql", 
-                                                                      HttpMethod.POST,
+    ResponseEntity<String> responseEntity = restTemplate.exchange("https://api.github.com/graphql",                                                                                                                                                                                                                                                                                         
+                                                                      HttpMethod.POST,                                                                                                                                                                                                                                                                                                               
                                                                       requestEntity, 
                                                                       String.class);
     // checking status
     if (HttpStatus.OK.equals(responseEntity.getStatusCode())) {
       logger.info("voila");
+      Gson g = new Gson();
+      JSONObject data = g.fromJson(responseEntity.getBody(), JSONObject.class);  
+
+      
+      // parseResponseBody(responseEntity.getBody());
     }
   }
 
@@ -166,5 +177,7 @@ class DemoBusinessApi {
       return "NA";
     }
   }
+
+
 
 }
